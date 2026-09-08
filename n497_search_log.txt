@@ -1,0 +1,11 @@
+n=497
+window=[218,279]
+candidate_vertices=238328
+base_monochromatic=14715071917
+flip_count=4750
+cumulative_delta=-77600
+next_best_delta=0
+final_monochromatic=14714994317
+exact_strict_improvement=TRUE
+generated_certificate=n497_reproduced_certificate.json
+RESULT=PASS
