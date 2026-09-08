@@ -1,0 +1,12 @@
+{
+  "resource_type": "publication-preprint",
+  "title": "A Finite De Bruijn Certificate Improving the Upper Bound for One-Round Randomized 2-Coloring of Cycles",
+  "creators": [{"name": "Yonezu, Ryutaro", "affiliation": "Independent Researcher"}],
+  "version": "v1.0.0",
+  "publication_date": "2026-09-09",
+  "license": "cc-by-4.0",
+  "keywords": ["distributed graph coloring", "randomized distributed algorithms", "cycles", "De Bruijn graph", "one-round algorithms", "finite certificates", "computer-assisted proof", "local search", "reproducibility"],
+  "paper_doi": null,
+  "software_doi": null,
+  "github": "https://github.com/yonezaemon1-hub/finite-de-bruijn-certificate-one-round-2-coloring"
+}
