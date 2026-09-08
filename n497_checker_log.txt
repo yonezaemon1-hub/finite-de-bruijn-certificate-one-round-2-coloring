@@ -1,0 +1,11 @@
+n=497
+flip_count=4750
+vertices=122763473
+monochromatic=14714994317
+cut=46298451764
+edges=61013446081
+partition_check=PASS
+expected_mono_target=14714994317
+target_match=PASS
+exact_strict_improvement=TRUE
+RESULT=PASS
