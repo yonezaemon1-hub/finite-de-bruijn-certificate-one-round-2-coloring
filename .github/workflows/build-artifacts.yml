@@ -1,0 +1,64 @@
+name: Build reproducible artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - reproduce_n497_search.cpp
+      - generate_embedded_checker.py
+      - check_n281_base.cpp
+      - paper.tex
+      - .github/workflows/build-artifacts.yml
+
+permissions:
+  contents: write
+
+jobs:
+  reproduce-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra
+
+      - name: Reproduce n=497 search certificate
+        run: |
+          g++ -O2 -std=c++17 reproduce_n497_search.cpp -o reproduce_n497_search
+          ./reproduce_n497_search n497_certificate.json | tee n497_search_ci_log.txt
+          echo '41e62c73421e9ca33b097ecedda6d31b398ed8189d74444258c8015e197f193c  n497_certificate.json' | sha256sum -c -
+
+      - name: Regenerate embedded exact checker
+        run: |
+          python3 generate_embedded_checker.py
+          echo '06280be157851220138e8fec38d2852acda1b59543a0838040d57a3e171cf582  check_n497_embedded_certificate.cpp' | sha256sum -c -
+
+      - name: Run exact checkers
+        run: |
+          g++ -O2 -std=c++17 check_n497_embedded_certificate.cpp -o check_n497
+          ./check_n497 | tee n497_checker_ci_log.txt
+          diff -u n497_checker_log.txt n497_checker_ci_log.txt
+          g++ -O2 -std=c++17 check_n281_base.cpp -o check_n281
+          ./check_n281 | tee n281_checker_ci_log.txt
+          diff -u n281_checker_log.txt n281_checker_ci_log.txt
+
+      - name: Build manuscript PDF
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error paper.tex
+          pdflatex -interaction=nonstopmode -halt-on-error paper.tex
+          mv paper.pdf Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
+          sha256sum Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
+
+      - name: Commit generated artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add n497_certificate.json check_n497_embedded_certificate.cpp Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
+          if git diff --cached --quiet; then
+            echo 'Generated artifacts already current.'
+          else
+            git commit -m 'Generate reproducible certificate, checker, and manuscript PDF'
+            git push
+          fi
