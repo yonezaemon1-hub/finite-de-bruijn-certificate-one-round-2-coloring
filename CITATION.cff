@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this preprint, please cite it as below."
+title: "A Finite De Bruijn Certificate Improving the Upper Bound for One-Round Randomized 2-Coloring of Cycles"
+type: article
+authors:
+  - family-names: Yonezu
+    given-names: Ryutaro
+version: "1.0.0"
+date-released: 2026-09-09
+url: "https://github.com/yonezaemon1-hub/finite-de-bruijn-certificate-one-round-2-coloring"
