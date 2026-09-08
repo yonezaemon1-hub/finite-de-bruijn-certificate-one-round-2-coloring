@@ -1,0 +1,11 @@
+{
+  "title": "A Finite De Bruijn Certificate Improving the Upper Bound for One-Round Randomized 2-Coloring of Cycles: Source and Reproducibility Package",
+  "upload_type": "software",
+  "description": "Source, manuscript, deterministic n=497 local-search reproducer, exact n=497 and n=281 certificate checkers, frozen logs, and source/prepublication audits accompanying the preprint A Finite De Bruijn Certificate Improving the Upper Bound for One-Round Randomized 2-Coloring of Cycles.",
+  "creators": [
+    {"name": "Yonezu, Ryutaro", "affiliation": "Independent Researcher"}
+  ],
+  "license": "mit",
+  "keywords": ["distributed graph coloring", "randomized distributed algorithms", "cycles", "De Bruijn graph", "one-round algorithms", "finite certificates", "computer-assisted proof", "local search", "reproducibility"],
+  "version": "v1.0.0"
+}
