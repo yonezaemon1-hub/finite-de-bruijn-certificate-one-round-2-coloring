@@ -1,0 +1,596 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand{\DB}{\operatorname{DB}}
+\newcommand{\normal}{\mathrm{normal}}
+\newcommand{\Unif}{\operatorname{Unif}}
+\newcommand{\1}{\mathbf{1}}
+
+\title{\textbf{A Finite De Bruijn Certificate Improving the Upper Bound\\
+for One-Round Randomized 2-Coloring of Cycles}}
+\author{Ryutaro Yonezu\\Independent Researcher}
+\date{September 9, 2026\\\small Preprint draft --- not peer reviewed}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Flin, Raevskaya, Stimpert, Suomela, and Yang recently reduced one-round
+randomized 2-coloring of directed cycles to cuts in three-dimensional De
+Bruijn graphs and proved
+\[
+  0.23879\le p^*<0.24118.
+\]
+Their formally verified three-parameter construction has exact monochromatic-edge
+probability
+\[
+  \frac{94835}{393216}=0.2411778767903646\ldots.
+\]
+We give an explicit finite coloring of the normal De Bruijn graph
+$\DB_{\normal}(497)$ with exactly $14{,}714{,}994{,}317$ monochromatic edges
+out of $61{,}013{,}446{,}081$ directed edges.  Hence
+\[
+  p^*\le
+  \frac{14{,}714{,}994{,}317}{61{,}013{,}446{,}081}
+  =0.2411762531404098\ldots
+  <\frac{94835}{393216}.
+\]
+The coloring is the midpoint discretization of the published
+three-parameter rule, followed by $4750$ explicitly listed vertex flips.
+The strict improvement is certified by exact integer arithmetic; in
+particular, the relevant cross-product difference is
+$-38{,}953{,}738{,}163$.  We also show that no local flips are needed merely
+to obtain a strict improvement: the unmodified midpoint discretization at
+$n = 281$ already beats the published exact value.  The contribution is a
+finite, machine-checkable upper-bound certificate within the De Bruijn
+framework of Flin et al.; we do not claim a new general framework, a lower
+bound, or optimality of the displayed finite cuts.
+\end{abstract}
+
+\noindent\textbf{Keywords.} distributed graph algorithms; randomized local algorithms; cycle coloring; De Bruijn graphs; maximum cut; finite certificates.
+
+\section{Introduction}
+
+Consider a directed cycle whose nodes run a randomized distributed algorithm
+for one communication round and then output one of two colors.  A proper
+2-coloring cannot always be produced, so the objective is to minimize the
+expected fraction of monochromatic edges.  In the standard continuous-randomness
+formulation, a one-round algorithm is a measurable function
+\[
+  f:[0,1]^3\to\{0,1\},
+\]
+where the three arguments are the independent random values held by a node's
+predecessor, the node itself, and its successor.  If $A,B,C,D$ are i.i.d.
+$\Unif[0,1]$, define
+\[
+  p(f):=\Pr\bigl[f(A,B,C)=f(B,C,D)\bigr],
+  \qquad
+  p^*:=\inf_f p(f).
+\]
+
+Flin et al.~\cite{flin2026arxiv,flin2026podc} developed a systematic finite
+reformulation of this problem using normal and distinct three-dimensional De
+Bruijn graphs.  Their main result is
+\[
+  0.23879\le p^*<0.24118.
+\]
+For the upper bound, they discovered a three-parameter recursive cutoff rule
+and formally verified its exact value in Lean 4.  In the public formalization
+at the pinned commit cited in the bibliography, the file
+\texttt{Distributed2Coloring/UpperBound/Recursive3Param.lean} defines
+\[
+  t = \frac58,
+  \qquad
+  t_1 = \frac38,
+  \qquad
+  t_2 = \frac{17}{32},
+\]
+and the file
+\texttt{Distributed2Coloring/UpperBound/Recursive3Param/Final.lean}
+proves~\cite{flin2026lean}
+\[
+  p_0:=\frac{94835}{393216}
+  =0.2411778767903646\ldots.
+\]
+The repository's \texttt{Distributed2Coloring/MainResults.lean} packages
+the resulting public statement $p^*<0.24118$; it does not contain the exact
+rational equality, which is proved in the \texttt{Recursive3Param} files
+just cited.
+
+This note asks a deliberately narrow question: can the same De Bruijn
+framework provide a finite coloring whose exact ratio is strictly smaller
+than $p_0$?  The answer is yes.
+
+\paragraph{Main result.}
+We construct an explicit coloring $h_{497}$ of $\DB_{\normal}(497)$ with
+\[
+  M_{497}=14{,}714{,}994{,}317
+\]
+monochromatic edges among
+\[
+  497^4=61{,}013{,}446{,}081
+\]
+directed edges.  By the De Bruijn upper-bound lemma of Flin et al., this gives
+\[
+  p^*\le\frac{M_{497}}{497^4}
+  =0.2411762531404098\ldots.
+\]
+The comparison with $p_0$ is exact:
+\[
+  M_{497}\cdot393216
+  -94835\cdot497^4
+  =-38{,}953{,}738{,}163<0.
+\]
+Thus the new bound is not a floating-point artifact.
+
+\paragraph{A simpler strict improvement.}
+The local-refinement step is not essential for the qualitative statement.
+The midpoint discretization of the published three-parameter rule on
+$\DB_{\normal}(281)$, with no vertex flips, has exactly
+$1{,}503{,}704{,}985$ monochromatic edges among $281^4=6{,}234{,}839{,}521$
+edges, and
+\[
+  1{,}503{,}704{,}985\cdot393216
+  -94835\cdot281^4
+  =-146{,}592{,}275<0.
+\]
+Hence even this short deterministic finite discretization already yields a
+strictly smaller certified upper bound than $p_0$.
+
+\paragraph{Scope.}
+The novelty claimed here is only the new finite upper-bound certificate and
+its exact verification.  The reduction from one-round randomized cycle
+coloring to De Bruijn cuts, the three-parameter base rule, and the idea of
+searching for good finite cuts all come from Flin et al.~\cite{flin2026arxiv}.
+We do not claim that $h_{497}$ is an optimal coloring of
+$\DB_{\normal}(497)$, and we do not improve the lower bound $0.23879$.
+
+\section{De Bruijn formulation}
+
+For an integer $n\ge2$, write $[n]=\{0,1,\dots,n-1\}$.  The normal
+three-dimensional De Bruijn graph is
+\[
+  \DB_{\normal}(n)=(V_n,E_n),
+\]
+where
+\[
+  V_n=[n]^3
+\]
+and
+\[
+  E_n=
+  \left\{
+    \bigl((a,b,c),(b,c,d)\bigr):a,b,c,d\in[n]
+  \right\}.
+\]
+Therefore
+\[
+  |V_n|=n^3,
+  \qquad
+  |E_n|=n^4.
+\]
+
+For a coloring $h:V_n\to\{0,1\}$, let
+\[
+  M(h):=
+  \#\left\{
+    (a,b,c,d)\in[n]^4:
+    h(a,b,c)=h(b,c,d)
+  \right\}
+\]
+be its number of monochromatic directed edges, and put
+\[
+  \rho(h):=\frac{M(h)}{n^4}.
+\]
+Let $p_{\normal}(n)$ be the minimum of $\rho(h)$ over all such colorings.
+
+We use the following consequence of Lemma~4.1 of Flin et al.~\cite{flin2026arxiv}.
+
+\begin{lemma}[Finite De Bruijn certificate]
+For every $n\ge2$ and every coloring $h:V_n\to\{0,1\}$,
+\[
+  p^*\le p_{\normal}(n)\le\rho(h).
+\]
+\end{lemma}
+
+\begin{proof}
+The first inequality is exactly the normal-De-Bruijn upper-bound lemma of
+Flin et al.  The second follows from the definition of
+$p_{\normal}(n)$ as the minimum monochromatic-edge fraction among all
+colorings of $\DB_{\normal}(n)$.
+\end{proof}
+
+Thus a new upper bound on $p^*$ can be proved by exhibiting any explicit
+finite coloring and counting its monochromatic edges exactly.
+
+\section{Base coloring}
+
+We start from the three-parameter recursive cutoff rule of Flin et
+al.~\cite{flin2026lean}.  The parameter definitions below are a direct
+transcription of
+\texttt{Distributed2Coloring/UpperBound/Recursive3Param.lean} at the pinned
+commit cited in the bibliography.
+This section states the rule explicitly so
+that the finite certificate does not depend on an informal geometric
+description.
+Set
+\[
+  t_1 = \frac38,
+  \qquad
+  t_2 = \frac{17}{32},
+  \qquad
+  t = \frac58.
+\]
+Define the base cutoff $z_{\mathrm{base}}:[0,1]^2\to[0,1]$ by
+\[
+ z_{\mathrm{base}}(x,y)=
+ \begin{cases}
+   1, & y\ge t\ \text{and }x<t,\\
+   t, & y\ge t\ \text{and }x\ge t,\\
+   0, & y<t\ \text{and }x\ge t,\\
+   t, & y<t,\ x<t,\ x\le y,\\
+   y, & y<t,\ x<t,\ x>y.
+ \end{cases}
+\]
+Inside the square $[t_1,t]^2$, replace this by
+\[
+ z_0(x,y)=
+ \begin{cases}
+   t_1, & y<t_2,\ x\ge t_2,\\
+   t_2, & y<t_2,\ x<t_2,\ x\le y,\\
+   y,   & y<t_2,\ x<t_2,\ x>y,\\
+   t,   & y\ge t_2,\ x<t_2,\\
+   t_2, & y\ge t_2,\ x\ge t_2,
+ \end{cases}
+\]
+and outside $[t_1,t]^2$ set $z_0=z_{\mathrm{base}}$.  Finally define
+\[
+  f_0(x,y,z):=\1\{z<z_0(x,y)\}.
+\]
+This is the same rational-parameter rule formalized by Flin et
+al.~\cite{flin2026lean}.
+
+For a finite size $n$, use midpoint representatives
+\[
+  x_i:=\frac{2i+1}{2n},
+  \qquad i\in[n],
+\]
+and define the midpoint discretization
+\[
+  h^{(n)}_0(i,j,k):=f_0(x_i,x_j,x_k).
+\]
+All comparisons against $t_1,t_2,t$ can be implemented using integer
+cross-products, so no floating-point arithmetic is needed.
+
+\begin{proposition}[Strict improvement without local flips]
+For $n = 281$, the midpoint coloring $h^{(281)}_0$ has
+\[
+  M\bigl(h^{(281)}_0\bigr)=1{,}503{,}704{,}985.
+\]
+Consequently,
+\[
+  p^*\le
+  \frac{1{,}503{,}704{,}985}{6{,}234{,}839{,}521}
+  =0.2411778169967753\ldots
+  <\frac{94835}{393216}.
+\]
+\end{proposition}
+
+\begin{proof}
+The exact checker evaluates the midpoint rule and counts all directed edges
+by the aggregation identity proved in Section~\ref{sec:verification}.  It
+returns
+\[
+  M=1{,}503{,}704{,}985,
+  \qquad
+  |E|=281^4=6{,}234{,}839{,}521.
+\]
+The strict comparison is certified by
+\[
+  1{,}503{,}704{,}985\cdot393216
+  -94835\cdot6{,}234{,}839{,}521
+  =-146{,}592{,}275<0.
+\]
+Apply the finite De Bruijn certificate lemma.
+\end{proof}
+
+\section{Refined certificate at n = 497}
+
+The strongest certificate reported here uses the same midpoint base coloring
+at $n = 497$ and then toggles a finite set of vertices.
+
+Let
+\[
+  F\subseteq[497]^3,
+  \qquad |F|=4750,
+\]
+be the explicit list supplied in the machine-readable certificate
+\texttt{n497\_certificate.json}.  Define
+\[
+  h_{497}(v):=h^{(497)}_0(v)\oplus\1\{v\in F\}.
+\]
+The full list is deliberately kept outside the manuscript; the theorem
+depends only on that fixed finite file and the exact checker.
+
+\paragraph{Search used for the reported refinement.}
+For reproducibility, the artifact package also contains the deterministic
+search that generated $F$.  Let $W=\{218,219,\ldots,279\}$.  Starting from
+$h^{(497)}_0$, for every candidate $v\in W^3$ let $\Delta M(v)$ be the exact
+change in the monochromatic-edge count produced by toggling $v$.  At each
+step, the search chooses a vertex with minimum negative $\Delta M(v)$,
+breaking ties lexicographically by $(a,b,c)$, applies that toggle, and
+repeats.  It stops when no negative change remains.  All changes are computed
+with integer counts.  This procedure terminates after exactly $4750$ flips;
+the cumulative change is $-77{,}600$, and the best remaining change is $0$.
+The resulting ordered flip list reproduces the supplied certificate exactly.
+This search description is included for experimental reproducibility and is
+not needed for the validity of the fixed finite certificate.
+
+For context, before applying the flips, the midpoint coloring already has
+\[
+  M\bigl(h^{(497)}_0\bigr)=14{,}715{,}071{,}917,
+\]
+corresponding to
+\[
+  0.2411775249912064\ldots,
+\]
+which is itself below $p_0$.  The $4750$ flips reduce the monochromatic-edge
+count by exactly $77{,}600$.
+
+\begin{theorem}[Improved finite upper bound]
+The coloring $h_{497}$ has exactly
+\[
+  M(h_{497})=14{,}714{,}994{,}317
+\]
+monochromatic directed edges.  Therefore
+\[
+  \boxed{
+  p^*\le
+  \frac{14{,}714{,}994{,}317}{61{,}013{,}446{,}081}
+  =0.2411762531404098\ldots
+  }
+\]
+and, in particular,
+\[
+  \frac{14{,}714{,}994{,}317}{61{,}013{,}446{,}081}
+  <\frac{94835}{393216}.
+\]
+\end{theorem}
+
+\begin{proof}
+The exact checker evaluates the fixed coloring $h_{497}$ and returns
+\[
+\begin{aligned}
+  |V_{497}|&=497^3=122{,}763{,}473,\\
+  M(h_{497})&=14{,}714{,}994{,}317,\\
+  |E_{497}|-M(h_{497})&=46{,}298{,}451{,}764,\\
+  |E_{497}|&=497^4=61{,}013{,}446{,}081.
+\end{aligned}
+\]
+Hence the monochromatic-edge fraction is the displayed rational number.
+The exact cross-product comparison with the published formally verified
+value is
+\[
+\begin{aligned}
+&14{,}714{,}994{,}317\cdot393216\\
+&\qquad
+-94{,}835\cdot61{,}013{,}446{,}081
+=-38{,}953{,}738{,}163<0.
+\end{aligned}
+\]
+The finite De Bruijn certificate lemma now gives the claimed upper bound on
+$p^*$.
+\end{proof}
+
+The numerical improvement over $p_0$ is
+\[
+  \frac{94835}{393216}
+  -\frac{14{,}714{,}994{,}317}{61{,}013{,}446{,}081}
+  =\frac{38{,}953{,}738{,}163}
+  {23{,}991{,}463{,}214{,}186{,}496}
+  \approx1.6236499548\times10^{-6}.
+\]
+It is small, but exact.
+
+\section{Exact verification}
+\label{sec:verification}
+
+A literal traversal of all $n^4$ directed edges is unnecessary.  For each
+ordered pair $(b,c)\in[n]^2$, define
+\[
+  L_1(b,c):=\sum_{a\in[n]} h(a,b,c),
+  \qquad
+  R_1(b,c):=\sum_{d\in[n]} h(b,c,d).
+\]
+Among the $n^2$ directed edges of the form
+\[
+  (a,b,c)\to(b,c,d)
+\]
+with fixed $(b,c)$, the number of monochromatic edges is
+\[
+  L_1(b,c)R_1(b,c)
+  +\bigl(n-L_1(b,c)\bigr)\bigl(n-R_1(b,c)\bigr).
+\]
+Similarly, the cut-edge count is
+\[
+  L_1(b,c)\bigl(n-R_1(b,c)\bigr)
+  +\bigl(n-L_1(b,c)\bigr)R_1(b,c).
+\]
+Summing over $(b,c)$ yields the exact total in $O(n^3)$ arithmetic
+operations.
+
+\begin{lemma}[Aggregation identity]
+For every coloring $h:[n]^3\to\{0,1\}$,
+\[
+  M(h)=
+  \sum_{b,c\in[n]}
+  \left[
+    L_1(b,c)R_1(b,c)
+    +(n-L_1(b,c))(n-R_1(b,c))
+  \right].
+\]
+\end{lemma}
+
+\begin{proof}
+Fix $(b,c)$.  A directed edge $(a,b,c)\to(b,c,d)$ is monochromatic with
+color $1$ exactly when both endpoints have color $1$, giving
+$L_1R_1$ choices.  It is monochromatic with color $0$ exactly when both
+endpoints have color $0$, giving $(n-L_1)(n-R_1)$ choices.  These cases are
+disjoint and exhaustive among monochromatic edges with the fixed middle pair
+$(b,c)$.  Summing over all $n^2$ middle pairs counts every directed edge
+exactly once.
+\end{proof}
+
+The supplied C++ checker uses unsigned 64-bit integers for the edge counts and
+128-bit integers for rational cross-products.  At $n = 497$, all raw counts are
+well below $2^{64}$.  The final run verifies both
+\[
+  M+\mathrm{cut}=n^4
+\]
+and the exact target count before returning success.
+
+\begin{table}[t]
+\centering
+\caption{Exact values relevant to the upper-bound improvement.  The last
+column is $M\cdot393216-94835\cdot n^4$; a negative value certifies a strict
+improvement over $94835/393216$.}
+\begin{tabular}{lrrrr}
+\toprule
+Certificate & $n$ & Monochromatic edges $M$ & Fraction & Cross product \\
+\midrule
+Midpoint base & 281 & 1,503,704,985 & 0.2411778169967753 & -146,592,275 \\
+Midpoint base & 497 & 14,715,071,917 & 0.2411775249912064 & -8,440,176,563 \\
+Refined & 497 & 14,714,994,317 & 0.2411762531404098 & -38,953,738,163 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Reproducibility and certificate boundary}
+
+\paragraph{Artifact availability in this proofreading draft.}
+The certificate files listed below are distributed with this manuscript in
+\texttt{Yonezu\_Paper11\_Proofreading\_Bundle\_v0.5.zip}.  A permanent
+public GitHub repository and Zenodo software DOI have not yet been assigned;
+those identifiers are a required prepublication item and will replace this
+draft-local locator before public release.  No public URL or DOI is fabricated
+in the present draft.
+
+The certificate package contains:
+\begin{enumerate}[leftmargin=1.8em]
+  \item \texttt{n497\_certificate.json}, containing the base-rule metadata and
+  the explicit list of $4750$ flipped vertices;
+  \item \texttt{reproduce\_n497\_search.cpp}, the standalone deterministic
+  local-search reproducer that starts from the midpoint base coloring and
+  regenerates the ordered flip list without reading the certificate;
+  \item \texttt{SEARCH\_REPRODUCTION.md}, documenting the exact one-flip
+  objective change, tie-breaking rule, stopping rule, and update scheme;
+  \item \texttt{check\_n497\_embedded\_certificate.cpp}, a standalone exact
+  checker with the flip list embedded in source form;
+  \item \texttt{check\_n281\_base.cpp}, a standalone checker for the simpler
+  no-flip certificate;
+  \item \texttt{reproduce\_all.sh} and \texttt{reproduce\_all.ps1}, which
+  compile the reproducer and checkers, regenerate the $n=497$ certificate,
+  compare it byte-for-byte with the canonical JSON, and rerun both exact
+  checkers;
+  \item logs recording the exact integer outputs of the search and checkers.
+\end{enumerate}
+
+For the fixed files used in this draft, the SHA-256 values are
+\begin{quote}\small\ttfamily
+n497\_certificate.json\\
+41e62c73421e9ca33b097ecedda6d31b\\
+398ed8189d74444258c8015e197f193c\\[0.5ex]
+reproduce\_n497\_search.cpp\\
+4bb0bfe5467deb76a5e2861b0c13c2f\\
+8a95de6e612ecd7d11ce5d2bbbfa7a3db\\[0.5ex]
+check\_n497\_embedded\_certificate.cpp\\
+06280be157851220138e8fec38d2852ac\\
+da1b59543a0838040d57a3e171cf582
+\end{quote}
+Each two-line hexadecimal value is to be concatenated without whitespace.
+
+The theorem itself still requires only reconstructing the fixed finite
+coloring, evaluating the aggregation identity, and checking one integer
+inequality.  The additional search reproducer closes the stronger experimental
+reproducibility loop: base coloring $\to$ deterministic local search $\to$
+regenerated certificate $\to$ exact checker.  The reproduced JSON is
+byte-identical to the canonical certificate.  No stochastic optimization,
+floating-point tolerance, or solver output is involved in either the search
+reproduction or the proof-certificate verdict.
+
+\section{Discussion and limitations}
+
+The result improves the published exact value of the three-parameter
+construction of Flin et al., but the improvement is numerically modest.  It narrows the interval between the published lower
+bound $0.23879$ and the upper bound by about $0.068\%$ relative to the
+previous interval width.
+
+More importantly, the result should not be interpreted as evidence that the
+finite coloring is close to optimal.  We have not computed
+$p_{\normal}(497)$ exactly, nor do we provide a lower bound on the maximum cut
+of $\DB_{\normal}(497)$.  Further finite local search, stronger combinatorial
+optimization, or a new structured continuous rule may lower the upper bound
+again.
+
+The $n = 281$ proposition also highlights a discretization effect: the finite
+midpoint evaluation of the existing continuous rule can lie slightly below
+its continuous exact value.  This is fully legitimate in the De Bruijn
+framework because each finite coloring independently induces a valid
+one-round randomized algorithm through the discretization lemma.  The
+$n = 497$ local refinement then exploits the additional freedom of arbitrary
+finite colorings beyond direct samples of the continuous surface.
+
+\section{Conclusion}
+
+We have exhibited a finite, exactly checkable De Bruijn coloring giving
+\[
+  p^*\le0.2411762531404098\ldots,
+\]
+strictly improving the formally verified value
+$94835/393216=0.2411778767903646\ldots$ associated with the previously
+published three-parameter rule.  The theorem follows from an explicit
+$497$-symbol coloring, exact integer edge counting, and the normal De Bruijn
+upper-bound lemma of Flin et al.  A simpler $281$-symbol midpoint
+discretization already suffices for a strict improvement, while the refined
+$497$-symbol certificate yields the stronger numerical bound reported here.
+
+\begin{thebibliography}{9}
+
+\bibitem{flin2026podc}
+M.~Flin, A.~Raevskaya, R.~Stimpert, J.~Suomela, and Q.~Yang.
+\newblock Brief Announcement: 2-Coloring Cycles in One Round.
+\newblock In \emph{Proceedings of the 2026 ACM Symposium on Principles of
+Distributed Computing (PODC 2026)}, pages 44--47, 2026.
+\newblock DOI: \href{https://doi.org/10.1145/3796701.3815937}{10.1145/3796701.3815937}.
+
+\bibitem{flin2026arxiv}
+M.~Flin, A.~Raevskaya, R.~Stimpert, J.~Suomela, and Q.~Yang.
+\newblock 2-Coloring Cycles in One Round.
+\newblock arXiv:2603.04235v2, March 2026.
+\newblock \href{https://arxiv.org/abs/2603.04235}{arXiv:2603.04235}.
+
+\bibitem{flin2026lean}
+M.~Flin, A.~Raevskaya, R.~Stimpert, J.~Suomela, and Q.~Yang.
+\newblock 2-Coloring Cycles in One Round: Formalization in Lean 4.
+\newblock GitHub repository \texttt{suomela/2-coloring-1-round}, 2026.
+\newblock Pinned commit: \texttt{aa04b54db9a48d7a5084e263c147607af7744498}.
+\newblock Parameter definitions:
+\texttt{Distributed2Coloring/UpperBound/Recursive3Param.lean}.
+\newblock Exact rational value:
+\texttt{Distributed2Coloring/UpperBound/Recursive3Param/Final.lean}.
+
+\end{thebibliography}
+
+\end{document}
