@@ -1,0 +1,20 @@
+import json
+from pathlib import Path
+
+PREFIX = '\n#include <cstdint>\n#include <iostream>\n#include <vector>\n#include <array>\n\nstatic constexpr int N = 497;\nstatic constexpr std::array<std::array<int,3>, 4750> FLIPS = {{\n'
+SUFFIX = '\n\nstatic inline bool pt_lt_frac(int i, int p, int q) {\n    // (2i+1)/(2N) < p/q\n    return (int64_t)(2*i+1)*q < (int64_t)2*N*p;\n}\nstatic inline bool pt_le_frac(int i, int p, int q) {\n    return (int64_t)(2*i+1)*q <= (int64_t)2*N*p;\n}\nstatic inline bool pt_ge_frac(int i, int p, int q) {\n    return (int64_t)(2*i+1)*q >= (int64_t)2*N*p;\n}\n\nstatic inline uint8_t base_color(int a, int b, int c) {\n    // Exact translation of the published recursive3Param z0 rule:\n    // t=5/8, t1=3/8, t2=17/32, color=1 iff z<z0(x,y)\n    bool x_in = pt_ge_frac(a,3,8) && pt_le_frac(a,5,8);\n    bool y_in = pt_ge_frac(b,3,8) && pt_le_frac(b,5,8);\n\n    if (x_in && y_in) {\n        if (pt_lt_frac(b,17,32)) {\n            if (pt_ge_frac(a,17,32)) {\n                return pt_lt_frac(c,3,8);\n            } else {\n                // q = t2 if x<=y, else q=y\n                if (a <= b) return pt_lt_frac(c,17,32);\n                else return c < b;\n            }\n        } else {\n            // y >= t2\n            if (pt_lt_frac(a,17,32)) return pt_lt_frac(c,5,8);\n            else return pt_lt_frac(c,17,32);\n        }\n    } else {\n        // zBase\n        if (pt_ge_frac(b,5,8)) {\n            if (pt_lt_frac(a,5,8)) return 1; // q=1; all midpoints are <1\n            else return pt_lt_frac(c,5,8);\n        } else {\n            if (pt_ge_frac(a,5,8)) return 0; // q=0\n            else {\n                // q=t if x<=y, else q=y\n                if (a <= b) return pt_lt_frac(c,5,8);\n                else return c < b;\n            }\n        }\n    }\n}\n\nint main() {\n    const uint64_t V=(uint64_t)N*N*N;\n    const uint64_t E=V*(uint64_t)N;\n    std::vector<uint8_t> X(V);\n\n    for (int a=0;a<N;++a)\n        for (int b=0;b<N;++b)\n            for (int c=0;c<N;++c) {\n                uint64_t id=((uint64_t)a*N+b)*N+c;\n                X[id]=base_color(a,b,c);\n            }\n\n    for (auto t: FLIPS) {\n        uint64_t id=((uint64_t)t[0]*N+t[1])*N+t[2];\n        X[id]^=1;\n    }\n\n    uint64_t mono=0, cut=0;\n    for (int b=0;b<N;++b) {\n        for (int c=0;c<N;++c) {\n            uint64_t left1=0,right1=0;\n            for (int a=0;a<N;++a)\n                left1 += X[((uint64_t)a*N+b)*N+c];\n            for (int d=0;d<N;++d)\n                right1 += X[((uint64_t)b*N+c)*N+d];\n            mono += left1*right1 + (N-left1)*(N-right1);\n            cut  += left1*(N-right1) + (N-left1)*right1;\n        }\n    }\n\n    const uint64_t KN=94835, KD=393216;\n    __int128 lhs=(__int128)mono*KD;\n    __int128 rhs=(__int128)KN*E;\n    bool better=lhs<rhs;\n\n    std::cout<<"n="<<N<<"\\n";\n    std::cout<<"flip_count="<<FLIPS.size()<<"\\n";\n    std::cout<<"vertices="<<V<<"\\n";\n    std::cout<<"monochromatic="<<mono<<"\\n";\n    std::cout<<"cut="<<cut<<"\\n";\n    std::cout<<"edges="<<E<<"\\n";\n    std::cout<<"partition_check="<<(mono+cut==E ? "PASS":"FAIL")<<"\\n";\n    std::cout<<"expected_mono_target=14714994317\\n";\n    std::cout<<"target_match="<<(mono==14714994317ULL ? "PASS":"FAIL")<<"\\n";\n    std::cout<<"exact_strict_improvement="<<(better ? "TRUE":"FALSE")<<"\\n";\n    std::cout<<"RESULT="<<((mono+cut==E && mono==14714994317ULL && better) ? "PASS":"FAIL")<<"\\n";\n    return (mono+cut==E && mono==14714994317ULL && better) ? 0 : 1;\n}\n'
+
+def main():
+    cert = json.loads(Path('n497_certificate.json').read_text())
+    flips = cert['flips']
+    if len(flips) != 4750:
+        raise SystemExit(f'expected 4750 flips, got {len(flips)}')
+    lines = []
+    for i, (a, b, c) in enumerate(flips):
+        comma = ',' if i + 1 < len(flips) else ''
+        lines.append(f'{{{a},{b},{c}}}{comma}')
+    out = PREFIX + '\n'.join(lines) + '\n}};' + SUFFIX
+    Path('check_n497_embedded_certificate.cpp').write_text(out)
+
+if __name__ == '__main__':
+    main()
