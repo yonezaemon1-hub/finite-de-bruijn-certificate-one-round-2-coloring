@@ -1,0 +1,10 @@
+n=281
+vertices=22188041
+monochromatic=1503704985
+cut=4731134536
+edges=6234839521
+partition_check=PASS
+expected_mono_target=1503704985
+target_match=PASS
+exact_strict_improvement=TRUE
+RESULT=PASS
