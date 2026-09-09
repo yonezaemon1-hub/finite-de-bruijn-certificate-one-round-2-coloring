@@ -2,7 +2,10 @@
 
 Ryutaro Yonezu, Independent Researcher
 
-Status: preprint release candidate / not peer reviewed. Permanent paper and software DOIs are pending and will be added before v1.0.0 is frozen.
+Status: preprint release candidate / not peer reviewed. Zenodo DOIs have been reserved but the records are not yet published and v1.0.0 is not yet frozen.
+
+- Paper DOI: `10.5281/zenodo.22670656` (reserved; not yet published)
+- Software DOI: `10.5281/zenodo.22669456` (reserved; not yet published)
 
 ## Main result
 
