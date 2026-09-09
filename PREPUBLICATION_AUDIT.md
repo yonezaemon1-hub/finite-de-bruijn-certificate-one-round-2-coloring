@@ -40,34 +40,44 @@ Reproduced result:
 - next-best `Delta M = 0`;
 - strict exact improvement: TRUE.
 
-## Independent GitHub Actions reproduction
-
-GitHub Actions run #1 (`Build reproducible artifacts`) completed successfully on Ubuntu 24.04. The clean runner:
-
-1. compiled `reproduce_n497_search.cpp`;
-2. regenerated `n497_certificate.json` from the base rule;
-3. verified its SHA-256 against the canonical certificate;
-4. regenerated `check_n497_embedded_certificate.cpp` from the certificate and verified its canonical SHA-256;
-5. compiled and ran both exact checkers and diffed their output against the frozen logs;
-6. rebuilt the manuscript with two `pdflatex` passes;
-7. committed the generated certificate, embedded checker, and PDF back to `main`.
-
-All seven steps passed. The GitHub-runner PDF has 8 pages and SHA-256
-
-`058d1b0aaef1ae36809cc22c30240c879de3033880d2e2527a851e2fc479c5f7`.
-
-The earlier local v0.5 PDF used a different TeX environment and has a different binary hash. The final publication PDF will be rebuilt after permanent identifiers are inserted, so neither draft-build hash is treated as the final frozen paper hash.
-
-## Current permanent locator status
+## Permanent identifiers and metadata
 
 Public GitHub repository: `yonezaemon1-hub/finite-de-bruijn-certificate-one-round-2-coloring`.
 
-The repository now exists and contains the source, deterministic search reproduction, canonical finite certificate, exact checkers, frozen logs, licenses, metadata, and build workflow. A Zenodo Software DOI and Paper DOI have not yet been assigned.
+Reserved archival identifiers for the planned `v1.0.0` release:
 
-The current manuscript still contains a draft-local artifact locator in Section 6. Before public release, that text must be replaced by the permanent GitHub repository and Zenodo Software DOI, followed by a fresh PDF build/hash and final prior-art / claim / proof / citation / publication preflight.
+- Paper DOI: `10.5281/zenodo.22670656`.
+- Software DOI: `10.5281/zenodo.22669456`.
+
+Both DOI values are now inserted into the manuscript source. The paper DOI is recorded in `CITATION.cff`; both identifiers are recorded in `paper.publish.json`; and `.zenodo.json` links the software package to the paper DOI with an `isSupplementTo` related identifier. The manuscript artifact-availability section now points to the public repository and the two reserved archival identifiers rather than to a draft-local bundle.
+
+## Independent GitHub Actions reproduction after DOI insertion
+
+GitHub Actions run #2 (`Build reproducible artifacts`) completed successfully on Ubuntu 24.04 after the DOI and permanent-locator edits. The clean runner:
+
+1. compiled `reproduce_n497_search.cpp`;
+2. regenerated `n497_certificate.json` from the base rule and verified its canonical SHA-256;
+3. regenerated `check_n497_embedded_certificate.cpp` and verified its canonical SHA-256;
+4. compiled and ran both exact checkers and diffed their output against the frozen logs;
+5. rebuilt the manuscript with two `pdflatex` passes;
+6. produced the DOI-bearing manuscript PDF;
+7. committed the generated PDF back to `main`.
+
+All stages passed. The authoritative hash of the final release-candidate PDF and the accompanying text/source files is recorded in `SHA256SUMS.txt` after the final manifest refresh rather than duplicated here.
+
+## Claim-boundary status
+
+- New finite upper-bound certificate: supported.
+- Exact integer verification: supported.
+- Deterministic search reproduction: supported.
+- New De Bruijn reduction: not claimed.
+- General novelty of local/heuristic search: not claimed.
+- Optimality of the `n=497` coloring or exact value of `p_normal(497)`: not claimed.
+- Improved lower bound or optimality of `p*`: not claimed.
+- Peer review: not performed.
 
 ## Publication status
 
-**NOT YET PUBLICATION PASS.**
+**PUBLICATION NOT YET PASS.**
 
-Remaining blocker: reserve/publish the archival identifiers, insert them into the manuscript and metadata, rebuild, rerun the exact reproduction/audits, and only then freeze `v1.0.0`.
+The mathematical, source, reproduction, identifier-insertion, and DOI-bearing PDF-build gates have passed. Remaining publication steps are: refresh and verify the final integrity manifest; freeze GitHub `v1.0.0`; publish the Zenodo Software and Paper records; and perform the final DOI / Related works cross-check. Because the GitHub repository is connected to Zenodo while a Software DOI has already been reserved manually, the GitHub-release / Zenodo-draft interaction must be checked before creating the public GitHub release so that a duplicate software record is not created.
