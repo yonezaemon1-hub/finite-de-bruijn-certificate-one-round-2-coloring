@@ -6,7 +6,7 @@
   "publication_date": "2026-09-09",
   "license": "cc-by-4.0",
   "keywords": ["distributed graph coloring", "randomized distributed algorithms", "cycles", "De Bruijn graph", "one-round algorithms", "finite certificates", "computer-assisted proof", "local search", "reproducibility"],
-  "paper_doi": null,
-  "software_doi": null,
+  "paper_doi": "10.5281/zenodo.22670656",
+  "software_doi": "10.5281/zenodo.22669456",
   "github": "https://github.com/yonezaemon1-hub/finite-de-bruijn-certificate-one-round-2-coloring"
 }
