@@ -7,5 +7,12 @@
   ],
   "license": "mit",
   "keywords": ["distributed graph coloring", "randomized distributed algorithms", "cycles", "De Bruijn graph", "one-round algorithms", "finite certificates", "computer-assisted proof", "local search", "reproducibility"],
-  "version": "v1.0.0"
+  "version": "v1.0.0",
+  "related_identifiers": [
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.22670656",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint"
+    }
+  ]
 }
