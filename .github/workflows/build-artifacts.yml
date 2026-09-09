@@ -51,14 +51,40 @@ jobs:
           mv paper.pdf Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
           sha256sum Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
 
+      - name: Refresh SHA-256 manifest
+        run: |
+          sha256sum \
+            .zenodo.json \
+            CITATION.cff \
+            LICENSE \
+            LICENSE_PAPER.txt \
+            PREPUBLICATION_AUDIT.md \
+            README.md \
+            SEARCH_REPRODUCTION.md \
+            SOURCE_AUDIT.md \
+            Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf \
+            check_n281_base.cpp \
+            check_n497_embedded_certificate.cpp \
+            n281_checker_log.txt \
+            n497_certificate.json \
+            n497_checker_log.txt \
+            n497_search_log.txt \
+            paper.publish.json \
+            paper.tex \
+            reproduce_all.ps1 \
+            reproduce_all.sh \
+            reproduce_n497_search.cpp \
+            > SHA256SUMS.txt
+          sha256sum -c SHA256SUMS.txt
+
       - name: Commit generated artifacts
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add n497_certificate.json check_n497_embedded_certificate.cpp Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
+          git add n497_certificate.json check_n497_embedded_certificate.cpp Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf SHA256SUMS.txt
           if git diff --cached --quiet; then
             echo 'Generated artifacts already current.'
           else
-            git commit -m 'Generate reproducible certificate, checker, and manuscript PDF'
+            git commit -m 'Generate reproducible certificate, checker, manuscript PDF, and integrity manifest'
             git push
           fi
