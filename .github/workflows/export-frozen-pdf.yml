@@ -1,0 +1,28 @@
+name: Export frozen PDF
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/export-frozen-pdf.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify frozen PDF SHA-256
+        run: |
+          echo 'e6f5ae6c759f5fbc58e8e5b8a82784617a31b65a6ab0b6afba5be7f1ef012532  Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf' | sha256sum -c -
+
+      - name: Upload frozen PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: frozen-paper-v1.0.0
+          path: Yonezu_2026_Finite_De_Bruijn_Certificate_One_Round_2_Coloring.pdf
+          if-no-files-found: error
+          compression-level: 0
