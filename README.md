@@ -2,10 +2,14 @@
 
 Ryutaro Yonezu, Independent Researcher
 
-Status: preprint release candidate / not peer reviewed. Zenodo DOIs have been reserved but the records are not yet published and v1.0.0 is not yet frozen.
+Status: preprint release candidate / not peer reviewed.
 
-- Paper DOI: `10.5281/zenodo.22670656` (reserved; not yet published)
-- Software DOI: `10.5281/zenodo.22669456` (reserved; not yet published)
+Archival identifiers for the planned `v1.0.0` release:
+
+- Paper DOI: `10.5281/zenodo.22670656`
+- Software DOI: `10.5281/zenodo.22669456`
+
+These identifiers are embedded before the `v1.0.0` freeze so that the tagged source, manuscript PDF, citation metadata, and Zenodo metadata agree.
 
 ## Main result
 
