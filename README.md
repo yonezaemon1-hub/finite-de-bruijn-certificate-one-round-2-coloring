@@ -92,3 +92,7 @@ This work claims only a new finite upper-bound certificate within the De Bruijn 
 
 - Manuscript text and PDF: CC BY 4.0.
 - Source-package software, search code, and checkers: MIT License unless otherwise noted.
+
+## Research inquiries
+
+For questions about this research, reproduction, or collaboration, contact Yonezu Research Lab: [yonezaemon1+research@gmail.com](mailto:yonezaemon1+research@gmail.com).
